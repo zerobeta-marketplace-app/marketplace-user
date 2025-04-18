@@ -52,7 +52,10 @@ export class UserService {
     
     try {
       const user = await this.userRepository.findOne({ where: { email } });
-      console.log('User found:', user);
+      console.log('✅ User found:', user);
+      console.log('🧠 Type:', typeof user);
+      console.dir(user, { depth: null });
+      //return JSON.stringify(user);
       return user;
     } catch (error) {
       console.error('Error finding user:', error);
