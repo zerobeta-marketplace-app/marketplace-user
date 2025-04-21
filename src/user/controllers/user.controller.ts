@@ -41,11 +41,6 @@ import {
       throw error;
     }
   }
-
-  @EventPattern('auth-test-topic')
-  handleTestEvent(data: any) {
-    this.logger.log(`Received test event: ${JSON.stringify(data)}`);
-  }
   
   @EventPattern('auth-test-message')
   handleAuthTestMessage(data: any) {

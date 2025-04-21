@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import * as bcrypt from 'bcryptjs';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { KAFKA_TOPICS } from '../../kafka/kafka.constants';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -15,7 +16,11 @@ export class UserService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const user = this.userRepository.create(createUserDto);
+    const hashedPassword = await bcrypt.hash(createUserDto.password, 10); 
+    const user = this.userRepository.create({
+      ...createUserDto,
+      password: hashedPassword,
+    });
     return await this.userRepository.save(user);
   }
 
@@ -35,6 +40,7 @@ export class UserService {
   async findByEmail(email: string): Promise<User> {
     const user = await this.userRepository.findOneBy({ email });
     if (!user) throw new NotFoundException('User not found');
+    console.log('User found:', user);
     return user;
   }
 
@@ -52,8 +58,6 @@ export class UserService {
     
     try {
       const user = await this.userRepository.findOne({ where: { email } });
-      console.log('✅ User found:', user);
-      console.log('🧠 Type:', typeof user);
       console.dir(user, { depth: null });
       //return JSON.stringify(user);
       return user;
