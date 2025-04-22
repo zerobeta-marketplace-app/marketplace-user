@@ -3,12 +3,13 @@ import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { writeFileSync } from 'fs';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     cors: {
-      origin: '*',               // ✅ allow all origins
-      credentials: true,         // ✅ allow cookies if needed
+      origin: '*',               // allow all origins
+      credentials: true,         // allow cookies if needed
     },
   });
 
@@ -36,6 +37,8 @@ async function bootstrap() {
    const document = SwaggerModule.createDocument(app, config);
    SwaggerModule.setup('api', app, document);
  
+   writeFileSync('./swagger-spec.json', JSON.stringify(document, null, 2));
+   
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

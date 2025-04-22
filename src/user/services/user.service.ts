@@ -8,15 +8,12 @@ import { User } from '../entities/user.entity';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { Inject } from '@nestjs/common';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Cache } from 'cache-manager';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache
 
   ) {}
 
@@ -37,12 +34,8 @@ export class UserService {
   }
 
   async findOne(id: number): Promise<User> {
-    const cached = await this.cacheManager.get<User>(`user-${id}`);
-    if (cached) return cached;
+    
     const user = await this.userRepository.findOneBy({ id });
-    if (user) {
-      await this.cacheManager.set(`user-${id}`, user, 1800); // Cache 30 mins
-    }
     if (!user) throw new NotFoundException('User not found');
     return user;
   }
